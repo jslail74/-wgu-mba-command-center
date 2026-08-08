@@ -76,6 +76,10 @@ table{width:100%;border-collapse:collapse;font-size:14px}
 th,td{text-align:left;padding:10px 6px;border-bottom:1px solid var(--line)}
 .goodText{color:#86efac} .badText{color:#fca5a5}
 .reviewItem{padding:12px;border:1px solid var(--line);border-radius:12px;margin:10px 0;background:#151e2d}
+.studyGuide details{border:1px solid var(--line);border-radius:12px;margin:10px 0;background:#151e2d;overflow:hidden}
+.studyGuide summary{cursor:pointer;padding:14px 16px;font-weight:800;list-style-position:inside}
+.studyGuide details p{margin:0;padding:0 16px 16px;line-height:1.55;color:var(--muted)}
+.studyGuide .cue{color:#bfdbfe;font-weight:800}
 @media(max-width:640px){
  .grid,.modeChoice,.analyticsGrid{grid-template-columns:1fr}
  .qtext{font-size:17px}
@@ -90,7 +94,7 @@ th,td{text-align:left;padding:10px 6px;border-bottom:1px solid var(--line)}
     <div class="toprow">
       <div>
         <div class="brand">WGU MBA Practice Center</div>
-        <div class="sub">Mobile study hub • v2.8 • final OA preparation • saves progress on this device</div>
+        <div class="sub">Mobile study hub • v2.9 • final OA preparation • saves progress on this device</div>
       </div>
       <button class="ghost btn" onclick="toggleTheme()">◐</button>
     </div>
@@ -116,10 +120,23 @@ th,td{text-align:left;padding:10px 6px;border-bottom:1px solid var(--line)}
           <div class="stat">Tracks time & weak areas</div>
         </div>
       </div>
+      <div class="card studyGuide">
+        <span class="badge">LATEST PRE-ASSESSMENT MISSES</span>
+        <h2>Quick Study Guide</h2>
+        <p class="muted">Tap each concept to open its memory cue. All eight concepts missed on your passed August 8 pre-assessment are included.</p>
+        <details><summary>1. Affirmative action</summary><p><span class="cue">Remember: remedy past effects.</span> Affirmative action proactively addresses past exclusion or employment practices that created adverse effects. It expands opportunity; it does not guarantee jobs or replace qualifications.</p></details>
+        <details><summary>2. HR performance metrics</summary><p><span class="cue">Start with business goals.</span> Choose HR measures by first identifying the organization's goals, then measure whether staffing, development, retention, or other people practices help achieve them.</p></details>
+        <details><summary>3. Business case for diversity</summary><p><span class="cue">Think risk, reputation, talent, and decisions.</span> Diversity can broaden the talent pool and perspectives while reducing discrimination risk and negative public relations. It does not automatically increase employees' average education.</p></details>
+        <details><summary>4. Case interviews</summary><p><span class="cue">Show how you solve a current problem.</span> A case interview asks the candidate to analyze a realistic business situation and demonstrate reasoning that supports company goals. Describing a past event is a behavioral interview.</p></details>
+        <details><summary>5. Distributive fairness</summary><p><span class="cue">Distribution = outcome.</span> Distributive fairness concerns whether the hiring result is perceived as fair. People receiving a favorable outcome are generally more likely to appreciate it; procedural fairness concerns how the process was conducted.</p></details>
+        <details><summary>6. Training design</summary><p><span class="cue">Assess, then design.</span> Needs assessment identifies the gap. Designing the training system comes next and converts the gap into objectives, content, instructional methods, sequencing, and evaluation plans.</p></details>
+        <details><summary>7. OSHA and workplace violence</summary><p><span class="cue">OSHA = workplace safety.</span> OSHA advocates written and implemented workplace-violence prevention programs as part of protecting employee safety and health.</p></details>
+        <details><summary>8. Affective commitment</summary><p><span class="cue">Affective = affection.</span> An employee stays because of emotional attachment and identification with the organization's values and goals. Continuance means the cost of leaving is high; normative means feeling obligated to stay.</p></details>
+      </div>
       <div class="card" id="readinessCard">
         <div class="readinessTop"><div><span class="badge">PRACTICE READINESS</span><h2 id="readinessTitle">Building your baseline</h2></div><strong id="readinessScore">0%</strong></div>
         <div class="readinessMeter"><div class="readinessFill" id="readinessFill"></div></div>
-        <p class="muted" id="readinessMessage">Complete a Learn or Weak Areas session to begin measuring readiness.</p>
+        <p class="muted" id="readinessMessage">Complete a Learn or Final Review session to begin measuring readiness.</p>
         <div class="miniBars" id="readinessCompetencies"></div>
         <p class="muted" style="font-size:11px">Practice estimate only. Your WGU pre-assessment is already passed; use this meter to prepare for the OA.</p>
         <button class="btn ghost" onclick="resetReadiness()">Reset meter</button>
