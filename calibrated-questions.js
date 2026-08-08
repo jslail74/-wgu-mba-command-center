@@ -949,6 +949,58 @@ const CALIBRATED_Q = [
     "difficulty": 2
   },
   {
+    "q": "HR is choosing performance metrics for a new strategy. What should guide the choice first?",
+    "o": [
+      "The organization's business goals",
+      "Whichever data are easiest to collect",
+      "Individual employee preferences",
+      "The previous manager's favorite measures"
+    ],
+    "a": 0,
+    "r": "Useful HR metrics begin with business goals so the measures show whether people practices support the strategy.",
+    "tag": "Effective HR Management",
+    "difficulty": 2
+  },
+  {
+    "q": "Which statement best describes distributive fairness in hiring?",
+    "o": [
+      "Applicants judge whether selection outcomes are allocated fairly",
+      "Applicants judge only whether interview questions are polite",
+      "Every applicant must receive the same outcome",
+      "Only rejected applicants care about outcomes"
+    ],
+    "a": 0,
+    "r": "Distributive fairness concerns the perceived fairness of outcomes; people who receive favorable outcomes are generally more likely to view them positively.",
+    "tag": "Effective HR Management",
+    "difficulty": 2
+  },
+  {
+    "q": "After training needs are identified, which step converts those needs into objectives, content, and instructional methods?",
+    "o": [
+      "Designing the training system",
+      "Calculating voluntary turnover",
+      "Conducting job evaluation",
+      "Issuing progressive discipline"
+    ],
+    "a": 0,
+    "r": "Training design translates assessed needs into learning objectives, content, methods, sequencing, and evaluation plans.",
+    "tag": "Effective HR Management",
+    "difficulty": 2
+  },
+  {
+    "q": "Which federal agency advises that a written and implemented workplace-violence prevention program can reduce workplace violence?",
+    "o": [
+      "Occupational Safety and Health Administration (OSHA)",
+      "National Labor Relations Board (NLRB)",
+      "Securities and Exchange Commission (SEC)",
+      "Federal Trade Commission (FTC)"
+    ],
+    "a": 0,
+    "r": "OSHA provides workplace-violence prevention guidance as part of its workplace safety and health mission.",
+    "tag": "Legal & Regulatory",
+    "difficulty": 2
+  },
+  {
     "q": "Benefits help employers compete for talent and also:",
     "o": [
       "Guarantee retention",

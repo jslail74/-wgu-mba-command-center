@@ -90,7 +90,7 @@ th,td{text-align:left;padding:10px 6px;border-bottom:1px solid var(--line)}
     <div class="toprow">
       <div>
         <div class="brand">WGU MBA Practice Center</div>
-        <div class="sub">Mobile study hub • v2.7 • fresh readiness baseline • saves progress on this device</div>
+        <div class="sub">Mobile study hub • v2.8 • final OA preparation • saves progress on this device</div>
       </div>
       <button class="ghost btn" onclick="toggleTheme()">◐</button>
     </div>
@@ -105,10 +105,10 @@ th,td{text-align:left;padding:10px 6px;border-bottom:1px solid var(--line)}
   <main>
     <section id="dashboard">
       <div class="card hero">
-        <span class="badge">RECOMMENDED NEXT</span>
-        <h1>Strengthen your two weak areas</h1>
-        <p class="muted">Start with 20 focused questions on Motivational Concepts and Effective HR Management. Learn from each explanation before taking another full exam.</p>
-        <button class="btn primary" onclick="startRecommended()">Start weak-area session</button>
+        <span class="badge">PRE-ASSESSMENT PASSED</span>
+        <h1>Finish with a focused OA review</h1>
+        <p class="muted">Your August 8 pre-assessment passed. Review the eight concepts you missed, then use one fresh 70-question simulation to confirm readiness for the OA.</p>
+        <button class="btn primary" onclick="startRecommended()">Start final review</button>
         <div class="statrow">
           <div class="stat">C202: 70 questions per attempt</div>
           <div class="stat">296 calibrated question variants</div>
@@ -121,7 +121,7 @@ th,td{text-align:left;padding:10px 6px;border-bottom:1px solid var(--line)}
         <div class="readinessMeter"><div class="readinessFill" id="readinessFill"></div></div>
         <p class="muted" id="readinessMessage">Complete a Learn or Weak Areas session to begin measuring readiness.</p>
         <div class="miniBars" id="readinessCompetencies"></div>
-        <p class="muted" style="font-size:11px">Practice estimate only. Use it to decide when another WGU pre-assessment will be informative.</p>
+        <p class="muted" style="font-size:11px">Practice estimate only. Your WGU pre-assessment is already passed; use this meter to prepare for the OA.</p>
         <button class="btn ghost" onclick="resetReadiness()">Reset meter</button>
       </div>
       <div class="grid">
@@ -149,9 +149,9 @@ th,td{text-align:left;padding:10px 6px;border-bottom:1px solid var(--line)}
             <span class="open">Start learning →</span>
           </div>
           <div id="weakModeCard" class="mode" role="button" tabindex="0" onclick="startMode('weak')">
-            <h3>Weak Areas · 20</h3>
-            <p class="muted">Targets motivation and effective HR management.</p>
-            <span class="open">Practice weak areas →</span>
+            <h3>Final Review · 20</h3>
+            <p class="muted">Targets the concepts missed on your latest passed pre-assessment.</p>
+            <span class="open">Practice final gaps →</span>
           </div>
           <div id="examModeCard" class="mode" role="button" tabindex="0" onclick="startMode('exam')">
             <h3>OA Simulation · 70</h3>
@@ -212,6 +212,7 @@ const HISTORY_KEY='wgu_c202_seen_questions_v4';
 const PROGRESS_KEY='wgu_c202_readiness_v2';
 const frames=['','During an HR leadership workshop, apply the relevant principle: ','An HR manager is advising a department leader: ','During a workforce policy review, the team asks: '];
 const BANK=CALIBRATED_Q.flatMap((item,source)=>frames.map((frame,variant)=>({...item,q:variant?frame+item.q[0].toLowerCase()+item.q.slice(1):item.q,sourceId:source,bankId:`${source}-${variant}`})));
+const FINAL_REVIEW_TERMS=['affirmative action','metric','business goal','diversity','case interview','distributive','training design','training system','workplace violence','osha','affective commitment','emotional attachment'];
 let mode='learn';
 let state={index:0,answers:Array(10).fill(null),graded:Array(10).fill(false),correct:Array(10).fill(false),bookmarks:Array(10).fill(false),startedAt:null,elapsedBase:0,finished:false,resultsRecorded:false,mode:'learn',exam:null};
 let timerHandle=null;
@@ -223,7 +224,7 @@ function showView(v){clearViews();document.getElementById(v).classList.remove('h
 function getProgress(){try{return JSON.parse(localStorage.getItem(PROGRESS_KEY))||{total:0,correct:0,by:{}}}catch(e){return {total:0,correct:0,by:{}}}}
 function recordResult(question,isCorrect){const p=getProgress();p.total++;p.correct+=isCorrect?1:0;p.by[question.tag]=p.by[question.tag]||{total:0,correct:0};p.by[question.tag].total++;p.by[question.tag].correct+=isCorrect?1:0;localStorage.setItem(PROGRESS_KEY,JSON.stringify(p))}
 function resetReadiness(){if(!confirm('Reset the readiness meter to zero? Bookmarks and saved tests will remain.'))return;localStorage.removeItem(PROGRESS_KEY);renderReadiness()}
-function renderReadiness(){const p=getProgress(),accuracy=p.total?Math.round(p.correct/p.total*100):0,evidence=Math.min(1,p.total/80),score=Math.round(accuracy*evidence);const areas=['Legal & Regulatory','Strategic HR','Effective HR Management','Motivational Concepts'];const scores=areas.map(a=>{const d=p.by[a]||{total:0,correct:0};return {a,total:d.total,score:d.total?Math.round(d.correct/d.total*100):0}});const gates=scores.every(x=>x.total>=8&&x.score>=70);const ready=p.total>=80&&accuracy>=80&&gates,close=!ready&&p.total>=40&&accuracy>=70;readinessScore.textContent=score+'%';readinessFill.style.width=score+'%';readinessTitle.textContent=ready?'Ready for the pre-assessment':close?'Getting close':'Building your baseline';readinessMessage.textContent=ready?'Your practice evidence is strong across all four competencies. Review due items, then retake the WGU pre-assessment.':close?'Keep training your lowest competency until every area is at least 70%.':`Complete ${Math.max(0,80-p.total)} more graded questions to build a reliable readiness signal.`;readinessCompetencies.innerHTML=scores.map(x=>`<div class="miniBar"><span>${x.a}</span><div class="miniTrack"><span style="width:${x.score}%"></span></div><b>${x.total?x.score+'%':'—'}</b></div>`).join('')}
+function renderReadiness(){const p=getProgress(),accuracy=p.total?Math.round(p.correct/p.total*100):0,evidence=Math.min(1,p.total/80),score=Math.round(accuracy*evidence);const areas=['Legal & Regulatory','Strategic HR','Effective HR Management','Motivational Concepts'];const scores=areas.map(a=>{const d=p.by[a]||{total:0,correct:0};return {a,total:d.total,score:d.total?Math.round(d.correct/d.total*100):0}});const gates=scores.every(x=>x.total>=8&&x.score>=70);const ready=p.total>=80&&accuracy>=80&&gates,close=!ready&&p.total>=40&&accuracy>=70;readinessScore.textContent=score+'%';readinessFill.style.width=score+'%';readinessTitle.textContent=ready?'OA practice-ready':close?'Getting close':'Building OA confidence';readinessMessage.textContent=ready?'Your practice evidence is strong across all four competencies. Complete Review Due, then schedule the OA when you feel rested and confident.':close?'Keep training your lowest competency, then complete one fresh OA simulation.':`Your pre-assessment is passed. Complete ${Math.max(0,80-p.total)} more graded practice questions to build a reliable OA readiness signal.`;readinessCompetencies.innerHTML=scores.map(x=>`<div class="miniBar"><span>${x.a}</span><div class="miniTrack"><span style="width:${x.score}%"></span></div><b>${x.total?x.score+'%':'—'}</b></div>`).join('')}
 function openC202(){clearViews();setup.classList.remove('hidden');navTest.classList.add('active');}
 function selectMode(m){mode=m;['learn','weak','exam'].forEach(x=>document.getElementById(x+'ModeCard').classList.toggle('selected',m===x));}
 function startMode(m){mode=m;startTest(false)}
@@ -234,7 +235,7 @@ function buildExam(count=EXAM_SIZE,focus=false){
   let seen=[];try{seen=JSON.parse(localStorage.getItem(HISTORY_KEY))||[]}catch(e){}
   let qOrder=[...Array(BANK.length).keys()].filter(i=>!seen.includes(BANK[i].bankId));
   if(qOrder.length<count){seen=[];qOrder=[...Array(BANK.length).keys()]}
-  if(focus){const priority=qOrder.filter(i=>['Motivational Concepts','Effective HR Management'].includes(BANK[i].tag));const other=qOrder.filter(i=>!priority.includes(i));qOrder=uniqueConcepts([...shuffleList(priority),...shuffleList(other)])}else qOrder=uniqueConcepts(shuffleList(qOrder))
+  if(focus){const priority=qOrder.filter(i=>{const text=(BANK[i].q+' '+BANK[i].r).toLowerCase();return FINAL_REVIEW_TERMS.some(term=>text.includes(term))});const secondary=qOrder.filter(i=>!priority.includes(i)&&['Motivational Concepts','Effective HR Management','Legal & Regulatory'].includes(BANK[i].tag));const other=qOrder.filter(i=>!priority.includes(i)&&!secondary.includes(i));qOrder=uniqueConcepts([...shuffleList(priority),...shuffleList(secondary),...shuffleList(other)])}else qOrder=uniqueConcepts(shuffleList(qOrder))
   qOrder=qOrder.slice(0,count);
   localStorage.setItem(HISTORY_KEY,JSON.stringify([...seen,...qOrder.map(i=>BANK[i].bankId)]));
   return qOrder.map((sourceIndex,pos)=>{
@@ -261,7 +262,7 @@ function startTest(resume){
 }
 function startRecommended(){mode='weak';startTest(false)}
 function resumeTest(){load();mode=state.mode||'learn';startTest(true)}
-function showTest(){clearViews();testView.classList.remove('hidden');bottomBar.classList.remove('hidden');navTest.classList.add('active');const labels={learn:'Learn Mode — immediate teaching',weak:'Weak-Area Mode — immediate teaching',exam:'OA Simulation — answers at end'};modeLabel.textContent=labels[state.mode]||labels.learn;renderQ();}
+function showTest(){clearViews();testView.classList.remove('hidden');bottomBar.classList.remove('hidden');navTest.classList.add('active');const labels={learn:'Learn Mode — immediate teaching',weak:'Final Review — latest pre-assessment gaps',exam:'OA Simulation — answers at end'};modeLabel.textContent=labels[state.mode]||labels.learn;renderQ();}
 function renderQ(){
  let i=state.index,x=examQuestion(i),a=state.answers[i];
  const total=state.exam.length, feedback=state.mode!=='exam';
