@@ -8,7 +8,7 @@ Main file:
 Vercel configuration:
 - vercel.json
 
-The current build includes the 100-question C202 practice OA with:
+The current build includes unique 70-question C202 practice attempts drawn from a tracked question pool with:
 - radio-button answers
 - Study Mode
 - Exam Mode
@@ -19,3 +19,5 @@ The current build includes the 100-question C202 practice OA with:
 - local progress saving
 - competency analytics
 - missed-question review
+- randomized answer positions
+- unseen-question tracking across attempts
