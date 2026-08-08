@@ -90,7 +90,7 @@ th,td{text-align:left;padding:10px 6px;border-bottom:1px solid var(--line)}
     <div class="toprow">
       <div>
         <div class="brand">WGU MBA Practice Center</div>
-        <div class="sub">Mobile study hub • v2.6 • duplicate-free sessions • saves progress on this device</div>
+        <div class="sub">Mobile study hub • v2.7 • fresh readiness baseline • saves progress on this device</div>
       </div>
       <button class="ghost btn" onclick="toggleTheme()">◐</button>
     </div>
@@ -122,6 +122,7 @@ th,td{text-align:left;padding:10px 6px;border-bottom:1px solid var(--line)}
         <p class="muted" id="readinessMessage">Complete a Learn or Weak Areas session to begin measuring readiness.</p>
         <div class="miniBars" id="readinessCompetencies"></div>
         <p class="muted" style="font-size:11px">Practice estimate only. Use it to decide when another WGU pre-assessment will be informative.</p>
+        <button class="btn ghost" onclick="resetReadiness()">Reset meter</button>
       </div>
       <div class="grid">
         <div class="course">
@@ -208,7 +209,7 @@ const Q = [{"q": "A company uses a neutral preemployment test that results in a 
 const EXAM_SIZE=70;
 const KEY='wgu_c202_practice_v5';
 const HISTORY_KEY='wgu_c202_seen_questions_v4';
-const PROGRESS_KEY='wgu_c202_readiness_v1';
+const PROGRESS_KEY='wgu_c202_readiness_v2';
 const frames=['','During an HR leadership workshop, apply the relevant principle: ','An HR manager is advising a department leader: ','During a workforce policy review, the team asks: '];
 const BANK=CALIBRATED_Q.flatMap((item,source)=>frames.map((frame,variant)=>({...item,q:variant?frame+item.q[0].toLowerCase()+item.q.slice(1):item.q,sourceId:source,bankId:`${source}-${variant}`})));
 let mode='learn';
@@ -221,6 +222,7 @@ function clearViews(){['dashboard','setup','testView','analytics','review'].forE
 function showView(v){clearViews();document.getElementById(v).classList.remove('hidden');if(v==='dashboard'){navDash.classList.add('active');renderReadiness()}}
 function getProgress(){try{return JSON.parse(localStorage.getItem(PROGRESS_KEY))||{total:0,correct:0,by:{}}}catch(e){return {total:0,correct:0,by:{}}}}
 function recordResult(question,isCorrect){const p=getProgress();p.total++;p.correct+=isCorrect?1:0;p.by[question.tag]=p.by[question.tag]||{total:0,correct:0};p.by[question.tag].total++;p.by[question.tag].correct+=isCorrect?1:0;localStorage.setItem(PROGRESS_KEY,JSON.stringify(p))}
+function resetReadiness(){if(!confirm('Reset the readiness meter to zero? Bookmarks and saved tests will remain.'))return;localStorage.removeItem(PROGRESS_KEY);renderReadiness()}
 function renderReadiness(){const p=getProgress(),accuracy=p.total?Math.round(p.correct/p.total*100):0,evidence=Math.min(1,p.total/80),score=Math.round(accuracy*evidence);const areas=['Legal & Regulatory','Strategic HR','Effective HR Management','Motivational Concepts'];const scores=areas.map(a=>{const d=p.by[a]||{total:0,correct:0};return {a,total:d.total,score:d.total?Math.round(d.correct/d.total*100):0}});const gates=scores.every(x=>x.total>=8&&x.score>=70);const ready=p.total>=80&&accuracy>=80&&gates,close=!ready&&p.total>=40&&accuracy>=70;readinessScore.textContent=score+'%';readinessFill.style.width=score+'%';readinessTitle.textContent=ready?'Ready for the pre-assessment':close?'Getting close':'Building your baseline';readinessMessage.textContent=ready?'Your practice evidence is strong across all four competencies. Review due items, then retake the WGU pre-assessment.':close?'Keep training your lowest competency until every area is at least 70%.':`Complete ${Math.max(0,80-p.total)} more graded questions to build a reliable readiness signal.`;readinessCompetencies.innerHTML=scores.map(x=>`<div class="miniBar"><span>${x.a}</span><div class="miniTrack"><span style="width:${x.score}%"></span></div><b>${x.total?x.score+'%':'—'}</b></div>`).join('')}
 function openC202(){clearViews();setup.classList.remove('hidden');navTest.classList.add('active');}
 function selectMode(m){mode=m;['learn','weak','exam'].forEach(x=>document.getElementById(x+'ModeCard').classList.toggle('selected',m===x));}
