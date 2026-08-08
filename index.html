@@ -47,6 +47,7 @@ p{line-height:1.45}
 .modeChoice{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .mode{padding:16px;background:#162033;border:1px solid var(--line);border-radius:14px;cursor:pointer}
 .mode.selected{outline:2px solid var(--accent)}
+.mode .open{display:block;margin-top:14px;color:#93c5fd;font-weight:800;font-size:14px}
 .progressWrap{height:8px;background:#222d40;border-radius:999px;overflow:hidden;margin-top:10px}
 .progressBar{height:100%;background:var(--accent);width:0}
 .questionCard{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
@@ -84,7 +85,7 @@ th,td{text-align:left;padding:10px 6px;border-bottom:1px solid var(--line)}
     <div class="toprow">
       <div>
         <div class="brand">WGU MBA Practice Center</div>
-        <div class="sub">Mobile study hub • v2.3 • retention-focused • saves progress on this device</div>
+        <div class="sub">Mobile study hub • v2.4 • tap-to-start learning • saves progress on this device</div>
       </div>
       <button class="ghost btn" onclick="toggleTheme()">◐</button>
     </div>
@@ -129,25 +130,28 @@ th,td{text-align:left;padding:10px 6px;border-bottom:1px solid var(--line)}
         <h2>C202 Practice OA</h2>
         <p class="muted">Short sessions build retention. Use the full simulation when you are ready to measure progress.</p>
         <div class="modeChoice">
-          <div id="learnModeCard" class="mode selected" onclick="selectMode('learn')">
+          <div id="learnModeCard" class="mode" role="button" tabindex="0" onclick="startMode('learn')">
             <h3>Learn · 10</h3>
             <p class="muted">Immediate answers and teaching rationales.</p>
+            <span class="open">Start learning →</span>
           </div>
-          <div id="weakModeCard" class="mode" onclick="selectMode('weak')">
+          <div id="weakModeCard" class="mode" role="button" tabindex="0" onclick="startMode('weak')">
             <h3>Weak Areas · 20</h3>
             <p class="muted">Targets motivation and effective HR management.</p>
+            <span class="open">Practice weak areas →</span>
           </div>
-          <div id="examModeCard" class="mode" onclick="selectMode('exam')">
+          <div id="examModeCard" class="mode" role="button" tabindex="0" onclick="startMode('exam')">
             <h3>OA Simulation · 70</h3>
             <p class="muted">No feedback until you submit the full exam.</p>
+            <span class="open">Begin simulation →</span>
           </div>
-          <div id="reviewModeCard" class="mode" onclick="showReview()">
+          <div id="reviewModeCard" class="mode" role="button" tabindex="0" onclick="showReview()">
             <h3>Review Due</h3>
             <p class="muted">Revisit missed and bookmarked questions.</p>
+            <span class="open">Open review →</span>
           </div>
         </div>
         <div class="row" style="margin-top:14px">
-          <button class="btn primary" onclick="startTest(false)">Start New Test</button>
           <button class="btn secondary" onclick="resumeTest()">Resume Saved Test</button>
         </div>
       </div>
@@ -204,6 +208,7 @@ function clearViews(){['dashboard','setup','testView','analytics','review'].forE
 function showView(v){clearViews();document.getElementById(v).classList.remove('hidden');if(v==='dashboard')navDash.classList.add('active');}
 function openC202(){clearViews();setup.classList.remove('hidden');navTest.classList.add('active');}
 function selectMode(m){mode=m;['learn','weak','exam'].forEach(x=>document.getElementById(x+'ModeCard').classList.toggle('selected',m===x));}
+function startMode(m){mode=m;startTest(false)}
 function sessionConfig(m){return m==='learn'?{size:10,focus:false}:m==='weak'?{size:20,focus:true}:{size:70,focus:false}}
 function shuffleList(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function buildExam(count=EXAM_SIZE,focus=false){
