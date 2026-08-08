@@ -90,7 +90,7 @@ th,td{text-align:left;padding:10px 6px;border-bottom:1px solid var(--line)}
     <div class="toprow">
       <div>
         <div class="brand">WGU MBA Practice Center</div>
-        <div class="sub">Mobile study hub • v2.5 • readiness tracking • saves progress on this device</div>
+        <div class="sub">Mobile study hub • v2.6 • duplicate-free sessions • saves progress on this device</div>
       </div>
       <button class="ghost btn" onclick="toggleTheme()">◐</button>
     </div>
@@ -210,7 +210,7 @@ const KEY='wgu_c202_practice_v5';
 const HISTORY_KEY='wgu_c202_seen_questions_v4';
 const PROGRESS_KEY='wgu_c202_readiness_v1';
 const frames=['','During an HR leadership workshop, apply the relevant principle: ','An HR manager is advising a department leader: ','During a workforce policy review, the team asks: '];
-const BANK=CALIBRATED_Q.flatMap((item,source)=>frames.map((frame,variant)=>({...item,q:variant?frame+item.q[0].toLowerCase()+item.q.slice(1):item.q,bankId:`${source}-${variant}`})));
+const BANK=CALIBRATED_Q.flatMap((item,source)=>frames.map((frame,variant)=>({...item,q:variant?frame+item.q[0].toLowerCase()+item.q.slice(1):item.q,sourceId:source,bankId:`${source}-${variant}`})));
 let mode='learn';
 let state={index:0,answers:Array(10).fill(null),graded:Array(10).fill(false),correct:Array(10).fill(false),bookmarks:Array(10).fill(false),startedAt:null,elapsedBase:0,finished:false,resultsRecorded:false,mode:'learn',exam:null};
 let timerHandle=null;
@@ -227,11 +227,12 @@ function selectMode(m){mode=m;['learn','weak','exam'].forEach(x=>document.getEle
 function startMode(m){mode=m;startTest(false)}
 function sessionConfig(m){return m==='learn'?{size:10,focus:false}:m==='weak'?{size:20,focus:true}:{size:70,focus:false}}
 function shuffleList(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function uniqueConcepts(order){const used=new Set();return order.filter(i=>{const source=BANK[i].sourceId;if(used.has(source))return false;used.add(source);return true})}
 function buildExam(count=EXAM_SIZE,focus=false){
   let seen=[];try{seen=JSON.parse(localStorage.getItem(HISTORY_KEY))||[]}catch(e){}
   let qOrder=[...Array(BANK.length).keys()].filter(i=>!seen.includes(BANK[i].bankId));
   if(qOrder.length<count){seen=[];qOrder=[...Array(BANK.length).keys()]}
-  if(focus){const priority=qOrder.filter(i=>['Motivational Concepts','Effective HR Management'].includes(BANK[i].tag));const other=qOrder.filter(i=>!priority.includes(i));qOrder=[...shuffleList(priority),...shuffleList(other)]}else shuffleList(qOrder)
+  if(focus){const priority=qOrder.filter(i=>['Motivational Concepts','Effective HR Management'].includes(BANK[i].tag));const other=qOrder.filter(i=>!priority.includes(i));qOrder=uniqueConcepts([...shuffleList(priority),...shuffleList(other)])}else qOrder=uniqueConcepts(shuffleList(qOrder))
   qOrder=qOrder.slice(0,count);
   localStorage.setItem(HISTORY_KEY,JSON.stringify([...seen,...qOrder.map(i=>BANK[i].bankId)]));
   return qOrder.map((sourceIndex,pos)=>{
