@@ -50,6 +50,11 @@ p{line-height:1.45}
 .mode .open{display:block;margin-top:14px;color:#93c5fd;font-weight:800;font-size:14px}
 .progressWrap{height:8px;background:#222d40;border-radius:999px;overflow:hidden;margin-top:10px}
 .progressBar{height:100%;background:var(--accent);width:0}
+.readinessMeter{height:16px;background:#222d40;border-radius:999px;overflow:hidden;margin:14px 0 8px}
+.readinessFill{height:100%;width:0;background:linear-gradient(90deg,#f59e0b,#60a5fa,#22c55e);transition:width .4s ease}
+.readinessTop{display:flex;justify-content:space-between;gap:12px;align-items:end}
+.readinessTop strong{font-size:28px}.readinessLabel{font-weight:800;color:#bfdbfe}
+.miniBars{display:grid;gap:9px;margin-top:16px}.miniBar{display:grid;grid-template-columns:minmax(130px,1fr) 2fr 42px;gap:9px;align-items:center;font-size:12px}.miniTrack{height:7px;background:#222d40;border-radius:999px;overflow:hidden}.miniTrack span{display:block;height:100%;background:#60a5fa}
 .questionCard{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
 .qmeta{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:13px;margin-bottom:8px}
 .qtext{font-size:18px;font-weight:700;line-height:1.42;margin-bottom:14px}
@@ -85,7 +90,7 @@ th,td{text-align:left;padding:10px 6px;border-bottom:1px solid var(--line)}
     <div class="toprow">
       <div>
         <div class="brand">WGU MBA Practice Center</div>
-        <div class="sub">Mobile study hub • v2.4 • tap-to-start learning • saves progress on this device</div>
+        <div class="sub">Mobile study hub • v2.5 • readiness tracking • saves progress on this device</div>
       </div>
       <button class="ghost btn" onclick="toggleTheme()">◐</button>
     </div>
@@ -110,6 +115,13 @@ th,td{text-align:left;padding:10px 6px;border-bottom:1px solid var(--line)}
           <div class="stat">Auto-saves progress</div>
           <div class="stat">Tracks time & weak areas</div>
         </div>
+      </div>
+      <div class="card" id="readinessCard">
+        <div class="readinessTop"><div><span class="badge">PRACTICE READINESS</span><h2 id="readinessTitle">Building your baseline</h2></div><strong id="readinessScore">0%</strong></div>
+        <div class="readinessMeter"><div class="readinessFill" id="readinessFill"></div></div>
+        <p class="muted" id="readinessMessage">Complete a Learn or Weak Areas session to begin measuring readiness.</p>
+        <div class="miniBars" id="readinessCompetencies"></div>
+        <p class="muted" style="font-size:11px">Practice estimate only. Use it to decide when another WGU pre-assessment will be informative.</p>
       </div>
       <div class="grid">
         <div class="course">
@@ -196,16 +208,20 @@ const Q = [{"q": "A company uses a neutral preemployment test that results in a 
 const EXAM_SIZE=70;
 const KEY='wgu_c202_practice_v5';
 const HISTORY_KEY='wgu_c202_seen_questions_v4';
+const PROGRESS_KEY='wgu_c202_readiness_v1';
 const frames=['','During an HR leadership workshop, apply the relevant principle: ','An HR manager is advising a department leader: ','During a workforce policy review, the team asks: '];
 const BANK=CALIBRATED_Q.flatMap((item,source)=>frames.map((frame,variant)=>({...item,q:variant?frame+item.q[0].toLowerCase()+item.q.slice(1):item.q,bankId:`${source}-${variant}`})));
 let mode='learn';
-let state={index:0,answers:Array(10).fill(null),graded:Array(10).fill(false),correct:Array(10).fill(false),bookmarks:Array(10).fill(false),startedAt:null,elapsedBase:0,finished:false,mode:'learn',exam:null};
+let state={index:0,answers:Array(10).fill(null),graded:Array(10).fill(false),correct:Array(10).fill(false),bookmarks:Array(10).fill(false),startedAt:null,elapsedBase:0,finished:false,resultsRecorded:false,mode:'learn',exam:null};
 let timerHandle=null;
 
 function save(){ localStorage.setItem(KEY,JSON.stringify(state)); }
 function load(){ try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.answers&&s.exam&&s.answers.length===s.exam.length) state=s;}catch(e){} }
 function clearViews(){['dashboard','setup','testView','analytics','review'].forEach(id=>document.getElementById(id).classList.add('hidden'));document.getElementById('bottomBar').classList.add('hidden');document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));}
-function showView(v){clearViews();document.getElementById(v).classList.remove('hidden');if(v==='dashboard')navDash.classList.add('active');}
+function showView(v){clearViews();document.getElementById(v).classList.remove('hidden');if(v==='dashboard'){navDash.classList.add('active');renderReadiness()}}
+function getProgress(){try{return JSON.parse(localStorage.getItem(PROGRESS_KEY))||{total:0,correct:0,by:{}}}catch(e){return {total:0,correct:0,by:{}}}}
+function recordResult(question,isCorrect){const p=getProgress();p.total++;p.correct+=isCorrect?1:0;p.by[question.tag]=p.by[question.tag]||{total:0,correct:0};p.by[question.tag].total++;p.by[question.tag].correct+=isCorrect?1:0;localStorage.setItem(PROGRESS_KEY,JSON.stringify(p))}
+function renderReadiness(){const p=getProgress(),accuracy=p.total?Math.round(p.correct/p.total*100):0,evidence=Math.min(1,p.total/80),score=Math.round(accuracy*evidence);const areas=['Legal & Regulatory','Strategic HR','Effective HR Management','Motivational Concepts'];const scores=areas.map(a=>{const d=p.by[a]||{total:0,correct:0};return {a,total:d.total,score:d.total?Math.round(d.correct/d.total*100):0}});const gates=scores.every(x=>x.total>=8&&x.score>=70);const ready=p.total>=80&&accuracy>=80&&gates,close=!ready&&p.total>=40&&accuracy>=70;readinessScore.textContent=score+'%';readinessFill.style.width=score+'%';readinessTitle.textContent=ready?'Ready for the pre-assessment':close?'Getting close':'Building your baseline';readinessMessage.textContent=ready?'Your practice evidence is strong across all four competencies. Review due items, then retake the WGU pre-assessment.':close?'Keep training your lowest competency until every area is at least 70%.':`Complete ${Math.max(0,80-p.total)} more graded questions to build a reliable readiness signal.`;readinessCompetencies.innerHTML=scores.map(x=>`<div class="miniBar"><span>${x.a}</span><div class="miniTrack"><span style="width:${x.score}%"></span></div><b>${x.total?x.score+'%':'—'}</b></div>`).join('')}
 function openC202(){clearViews();setup.classList.remove('hidden');navTest.classList.add('active');}
 function selectMode(m){mode=m;['learn','weak','exam'].forEach(x=>document.getElementById(x+'ModeCard').classList.toggle('selected',m===x));}
 function startMode(m){mode=m;startTest(false)}
@@ -235,7 +251,7 @@ function examQuestion(i){
 }
 function startTest(resume){
  const cfg=sessionConfig(mode);
- if(!resume) state={index:0,answers:Array(cfg.size).fill(null),graded:Array(cfg.size).fill(false),correct:Array(cfg.size).fill(false),bookmarks:Array(cfg.size).fill(false),startedAt:Date.now(),elapsedBase:0,finished:false,mode:mode,exam:buildExam(cfg.size,cfg.focus)};
+ if(!resume) state={index:0,answers:Array(cfg.size).fill(null),graded:Array(cfg.size).fill(false),correct:Array(cfg.size).fill(false),bookmarks:Array(cfg.size).fill(false),startedAt:Date.now(),elapsedBase:0,finished:false,resultsRecorded:false,mode:mode,exam:buildExam(cfg.size,cfg.focus)};
  if(!state.exam){state.exam=buildExam(cfg.size,cfg.focus);state.answers=Array(cfg.size).fill(null);state.graded=Array(cfg.size).fill(false);state.correct=Array(cfg.size).fill(false);state.bookmarks=Array(cfg.size).fill(false);state.index=0;}
  state.mode=state.mode||mode; if(!state.startedAt) state.startedAt=Date.now();
  save(); showTest(); startTimer();
@@ -266,7 +282,7 @@ function gradeCurrent(){
  let i=state.index,a=state.answers[i];
  if(a===null){alert('Select an answer first.');return;}
  if(state.mode!=='exam'){
-   if(!state.graded[i]){state.graded[i]=true;state.correct[i]=a===examQuestion(i).a;save();renderQ();}
+   if(!state.graded[i]){state.graded[i]=true;state.correct[i]=a===examQuestion(i).a;recordResult(examQuestion(i),state.correct[i]);save();renderQ();}
    else nextQ();
  } else {
    if(i===state.exam.length-1) submitExam(); else nextQ();
@@ -278,6 +294,7 @@ function toggleBookmark(){state.bookmarks[state.index]=!state.bookmarks[state.in
 function submitExam(){
  if(!confirm('Submit the exam and grade all answered questions?'))return;
  state.answers.forEach((a,i)=>{state.graded[i]=a!==null;state.correct[i]=a!==null&&a===examQuestion(i).a;});
+ if(!state.resultsRecorded){state.graded.forEach((g,i)=>{if(g)recordResult(examQuestion(i),state.correct[i])});state.resultsRecorded=true}
  state.finished=true; state.elapsedBase=currentElapsed(); state.startedAt=null; save(); showAnalytics();
 }
 function currentElapsed(){return (state.elapsedBase||0)+(state.startedAt?Date.now()-state.startedAt:0)}
@@ -310,6 +327,7 @@ function toggleTheme(){
  }
 }
 load();
+renderReadiness();
 </script>
 </body>
 </html>
